@@ -9,7 +9,10 @@
     "author": "Bisschops",
     "license": "LGPL-3",
     "depends": ["base"],
-    "data": [],
+    "data": [
+        "security/ir.access.csv",
+        "views/signage.xml",
+    ],
     "installable": True,
     "application": True,
 }

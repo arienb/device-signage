@@ -22,7 +22,7 @@ class Device(models.Model):
         ondelete = "restrict"
     )
 
-    expireDate = fields.Datetime(
+    expire_date = fields.Datetime(
         string="Expiration Date",
     )
 
