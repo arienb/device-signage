@@ -44,12 +44,11 @@ class Device(models.Model):
         required=True,
     )
 
-    _sql_constraints = [
-        (
-            "UNIQUE(code)",
-            "The device code must be unique.",
-        ),
-    ]
+
+    _code_unique = models.Constraint(
+        "UNIQUE(code)",
+        "The device code must be unique.",
+    )
 
     _external_id_unique = models.Constraint(
         "UNIQUE(external_id)",

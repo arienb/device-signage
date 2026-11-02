@@ -15,7 +15,6 @@ class CsvImporter(models.AbstractModel):
 
 
     def _get_import_settings(self):
-
         settings = self.env["res.config.settings"].sudo().create({})
 
         csv_folder = settings.csv_folder or "/mnt/csv"
@@ -43,7 +42,6 @@ class CsvImporter(models.AbstractModel):
 
 
     def _import_devices(self, file_path, delimiter):
-
         _logger.info("Starting device import: %s", file_path)
 
         if not os.path.isfile(file_path):
@@ -129,7 +127,7 @@ class CsvImporter(models.AbstractModel):
                             "state": state,
                         }
 
-                        # savepoint om  de import door te laten gaan bij fouten
+                        # savepoint om de import door te laten gaan bij fouten
                         with self.env.cr.savepoint():
 
                             device = self.env["signage.device"].search(
@@ -182,7 +180,6 @@ class CsvImporter(models.AbstractModel):
 
 
     def _import_content(self, file_path, delimiter):
-
         _logger.info("Starting content import: %s", file_path)
 
         if not os.path.isfile(file_path):
@@ -326,8 +323,43 @@ class CsvImporter(models.AbstractModel):
             _logger.exception("Could not read content CSV file: %s", file_path)
 
 
-    def action_import_all_deliveries(self):
+    def _get_delivery_folders(self, csv_folder):
+        deliveries = []
 
+        try:
+            for folder_name in os.listdir(csv_folder):
+                folder_path = os.path.join(csv_folder, folder_name)
+
+                if not os.path.isdir(folder_path):
+                    continue
+
+                if not folder_name.startswith("delivery_"):
+                    continue
+
+                delivery_number = folder_name.removeprefix("delivery_")
+
+                if not delivery_number.isdigit():
+                    _logger.warning(
+                        "Ignoring invalid delivery folder name: %s",
+                        folder_name,
+                    )
+                    continue
+
+                deliveries.append((int(delivery_number), folder_name))
+
+        except OSError:
+            _logger.exception(
+                "Could not read delivery folders in: %s",
+                csv_folder,
+            )
+            return []
+
+        deliveries.sort(key=lambda delivery: delivery[0])
+
+        return [folder_name for _, folder_name in deliveries]
+
+
+    def action_import_all_deliveries(self):
         _logger.info("Starting complete signage CSV import")
 
         # settings nakijken
@@ -345,7 +377,7 @@ class CsvImporter(models.AbstractModel):
             delimiter,
         )
 
-        deliveries = ["delivery_1", "delivery_2"]
+        deliveries = self._get_delivery_folders(csv_folder)
 
         # import devices
         for delivery in deliveries:
