@@ -5,6 +5,12 @@ class Device(models.Model):
     _description = "device"
     _order = "name"
 
+    external_id = fields.Integer(
+        string="External ID",
+        required=True,
+        index=True,
+    )
+
     name = fields.Char(
         string = "Name",
         required = True,
@@ -44,3 +50,8 @@ class Device(models.Model):
             "The device code must be unique.",
         ),
     ]
+
+    _external_id_unique = models.Constraint(
+        "UNIQUE(external_id)",
+        "The external ID must be unique.",
+    )

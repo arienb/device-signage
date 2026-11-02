@@ -10,6 +10,12 @@ class Device(models.Model):
         size = 100
     )
 
+    external_id = fields.Integer(
+        string="External ID",
+        required=True,
+        index=True,
+    )
+
     description = fields.Char(
         string = "Description",
         size = 128
@@ -36,3 +42,8 @@ class Device(models.Model):
         default="enabled",
         required=True,
     )
+
+    _external_id_unique = models.Constraint(
+        "UNIQUE(external_id)",
+        "The external ID must be unique.",
+    )    
