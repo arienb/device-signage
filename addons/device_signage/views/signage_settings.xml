@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_signage" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.signage</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app name="device_signage" string="Digital Signage">
+                    <block title="CSV Import Settings">
+                        <setting string="CSV Folder Path"
+                                 help="Local path to the folder containing the delivery folders.">
+                            <field name="csv_folder"/>
+                        </setting>
+
+                        <setting string="CSV Delimiter"
+                                 help="Character used to separate CSV columns.">
+                            <field name="csv_delimiter"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

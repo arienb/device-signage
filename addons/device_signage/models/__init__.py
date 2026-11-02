@@ -1,1 +1,1 @@
-from . import device, content
+from . import device, content, signage_settings

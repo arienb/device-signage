@@ -10,6 +10,7 @@
                 <field name="code"/>
                 <field name="description"/>
                 <field name="expire_date"/>
+                <field name="external_id" options="{'human_readable': False}"/>
                 <field name="state"/>
             </list>
         </field>
@@ -27,6 +28,7 @@
                         <field name="code"/>
                         <field name="description"/>
                         <field name="expire_date"/>
+                        <field name="external_id"/>
                         <field name="state"/>
                     </group>
                 </sheet>
@@ -44,6 +46,7 @@
                 <field name="device_id"/>
                 <field name="description"/>
                 <field name="expire_date"/>
+                <field name="external_id" options="{'human_readable': False}"/>
                 <field name="state"/>
             </list>
         </field>
@@ -61,6 +64,7 @@
                         <field name="device_id"/>
                         <field name="description"/>
                         <field name="expire_date"/>
+                        <field name="external_id"/>
                         <field name="state"/>
                     </group>
                 </sheet>

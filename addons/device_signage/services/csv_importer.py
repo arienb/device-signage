@@ -13,7 +13,36 @@ class CsvImporter(models.AbstractModel):
     _name = "signage.csv.importer"
     _description = "Digital Signage CSV Importer"
 
-    def _import_devices(self, file_path, delimiter=","):
+
+    def _get_import_settings(self):
+
+        settings = self.env["res.config.settings"].sudo().create({})
+
+        csv_folder = settings.csv_folder or "/mnt/csv"
+        csv_delimiter = settings.csv_delimiter or ","
+
+        csv_folder = csv_folder.strip()
+        csv_delimiter = csv_delimiter.strip()
+
+        if not csv_folder:
+            _logger.error("CSV folder path is not configured")
+            return None
+
+        if len(csv_delimiter) != 1:
+            _logger.error(
+                "Invalid CSV delimiter '%s'. Expected exactly one character.",
+                csv_delimiter,
+            )
+            return None
+
+        if not os.path.isdir(csv_folder):
+            _logger.error("CSV folder does not exist: %s", csv_folder)
+            return None
+
+        return csv_folder, csv_delimiter
+
+
+    def _import_devices(self, file_path, delimiter):
 
         _logger.info("Starting device import: %s", file_path)
 
@@ -152,14 +181,7 @@ class CsvImporter(models.AbstractModel):
             _logger.exception("Could not read device CSV file: %s", file_path)
 
 
-    def action_import_delivery_1(self):
-
-        file_path = "/mnt/csv/delivery_1/devices.csv"
-
-        self._import_devices(file_path)
-
-        
-    def _import_content(self, file_path, delimiter=","):
+    def _import_content(self, file_path, delimiter):
 
         _logger.info("Starting content import: %s", file_path)
 
@@ -303,3 +325,48 @@ class CsvImporter(models.AbstractModel):
         except (OSError, csv.Error):
             _logger.exception("Could not read content CSV file: %s", file_path)
 
+
+    def action_import_all_deliveries(self):
+
+        _logger.info("Starting complete signage CSV import")
+
+        # settings nakijken
+        settings = self._get_import_settings()
+
+        if not settings:
+            _logger.error("CSV import aborted due to invalid settings")
+            return
+
+        csv_folder, delimiter = settings
+
+        _logger.info(
+            "Using CSV folder: %s with delimiter: '%s'",
+            csv_folder,
+            delimiter,
+        )
+
+        deliveries = ["delivery_1", "delivery_2"]
+
+        # import devices
+        for delivery in deliveries:
+            file_path = os.path.join(
+                csv_folder,
+                delivery,
+                "devices.csv",
+            )
+
+            _logger.info("Processing device delivery: %s", delivery)
+            self._import_devices(file_path, delimiter)
+
+        # import content
+        for delivery in deliveries:
+            file_path = os.path.join(
+                csv_folder,
+                delivery,
+                "content.csv",
+            )
+
+            _logger.info("Processing content delivery: %s", delivery)
+            self._import_content(file_path, delimiter)
+
+        _logger.info("Complete signage CSV import finished")

@@ -12,6 +12,8 @@
     "data": [
         "security/ir.access.csv",
         "views/signage.xml",
+        "views/signage_settings.xml",
+        "data/cron.xml",
     ],
     "installable": True,
     "application": True,
